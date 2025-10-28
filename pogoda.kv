@@ -1,0 +1,42 @@
+<PomiarWiersz>:
+    orientation: 'vertical'
+    padding: 5
+
+    canvas.before:
+        Color:
+            rgba: (0.1, 0.4, 0.6, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: 0.5
+
+        Label:
+            text: root.godzina if root.godzina else ""
+            halign: 'left'
+            valign: 'middle'
+            text_size: self.size
+
+        Label:
+            text: root.temp if root.temp else ""
+            halign: 'right'
+            valign: 'middle'
+            text_size: self.size
+
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: 0.5
+
+        Label:
+            text: root.deszcz if root.deszcz else ""
+            halign: 'left'
+            valign: 'middle'
+            text_size: self.size
+
+        Label:
+            text: root.wiatr if root.wiatr else ""
+            halign: 'right'
+            valign: 'middle'
+            text_size: self.size
