@@ -1,0 +1,125 @@
+#: set primary_color (0.2, 0.6, 0.9, 1)
+#: set background_color (0.1, 0.1, 0.15, 1)
+#: set card_color (0.15, 0.25, 0.4, 1)
+
+<WeatherScreen>:
+    orientation: "vertical"
+    padding: dp(15)
+    spacing: dp(15)
+    canvas.before:
+        Color:
+            rgba: background_color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    Label:
+        text: "Prognoza"
+        font_size: '30sp'
+        bold: True
+        color: 1, 1, 1, 1
+        size_hint_y: None
+        height: dp(50)
+
+    Button:
+        text: "ODŚWIEŻ DANE RĘCZNIE"
+        font_size: '18sp'
+        size_hint_y: None
+        height: dp(55)
+        background_normal: ''
+        background_color: primary_color
+        color: 1, 1, 1, 1
+        on_release: root.get_data()
+    
+    Label:
+        text: "Przewiń, aby zobaczyć szczegóły:"
+        font_size: '14sp'
+        color: 0.7, 0.7, 0.7, 1
+        size_hint_y: None
+        height: dp(30)
+        
+    ScrollView:
+        do_scroll_x: True
+        do_scroll_y: False
+        size_hint_y: 0.8
+        
+        RecycleView:
+            id: rv
+            viewclass: 'WeatherItem'
+            scroll_type: ['bars']
+            bar_width: dp(5)
+            
+            RecycleBoxLayout:
+                orientation: 'horizontal'
+                default_size: dp(120), dp(150)
+                default_size_hint: None, 1
+                size_hint_y: 1
+                height: self.minimum_height
+                spacing: dp(15)
+
+<WeatherItem@BoxLayout>:
+    orientation: "vertical"
+    size_hint_x: None
+    width: dp(120)
+    padding: dp(10)
+    spacing: dp(8)
+    canvas.before:
+        Color:
+            rgba: card_color
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(12),]
+
+    Label:
+        text: root.hour
+        color: 1, 1, 1, 1
+        font_size: '20sp'
+        bold: True
+        size_hint_y: None
+        height: dp(25)
+
+    BoxLayout:
+        size_hint_y: None
+        height: dp(25)
+        
+        Label:
+            text: '\uf0eb'
+            color: 1, 0.8, 0.1, 1
+            size_hint_x: 0.3
+        
+        Label:
+            text: root.temp + "°C"
+            color: 1, 0.8, 0.1, 1
+            font_size: '16sp'
+            size_hint_x: 0.7
+
+    BoxLayout:
+        size_hint_y: None
+        height: dp(25)
+        
+        Label:
+            text: '\uf050'
+            color: 0.4, 0.8, 1, 1
+            size_hint_x: 0.3
+        
+        Label:
+            text: root.wind + " m/s"
+            color: 0.4, 0.8, 1, 1
+            font_size: '16sp'
+            size_hint_x: 0.7
+
+    BoxLayout:
+        size_hint_y: None
+        height: dp(25)
+        
+        Label:
+            text: '\uf043'
+            color: 0.6, 0.7, 1, 1
+            size_hint_x: 0.3
+        
+        Label:
+            text: root.shower + " mm"
+            color: 0.6, 0.7, 1, 1
+            font_size: '16sp'
+            size_hint_x: 0.7
