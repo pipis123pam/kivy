@@ -1,125 +1,430 @@
-#: set primary_color (0.2, 0.6, 0.9, 1)
-#: set background_color (0.1, 0.1, 0.15, 1)
-#: set card_color (0.15, 0.25, 0.4, 1)
-
-<WeatherScreen>:
-    orientation: "vertical"
-    padding: dp(15)
-    spacing: dp(15)
-    canvas.before:
-        Color:
-            rgba: background_color
-        Rectangle:
-            pos: self.pos
-            size: self.size
-
-    Label:
-        text: "Prognoza"
-        font_size: '30sp'
-        bold: True
-        color: 1, 1, 1, 1
-        size_hint_y: None
-        height: dp(50)
-
-    Button:
-        text: "ODŚWIEŻ DANE RĘCZNIE"
-        font_size: '18sp'
-        size_hint_y: None
-        height: dp(55)
-        background_normal: ''
-        background_color: primary_color
-        color: 1, 1, 1, 1
-        on_release: root.get_data()
-    
-    Label:
-        text: "Przewiń, aby zobaczyć szczegóły:"
-        font_size: '14sp'
-        color: 0.7, 0.7, 0.7, 1
-        size_hint_y: None
-        height: dp(30)
-        
-    ScrollView:
-        do_scroll_x: True
-        do_scroll_y: False
-        size_hint_y: 0.8
-        
-        RecycleView:
-            id: rv
-            viewclass: 'WeatherItem'
-            scroll_type: ['bars']
-            bar_width: dp(5)
-            
-            RecycleBoxLayout:
-                orientation: 'horizontal'
-                default_size: dp(120), dp(150)
-                default_size_hint: None, 1
-                size_hint_y: 1
-                height: self.minimum_height
-                spacing: dp(15)
-
-<WeatherItem@BoxLayout>:
-    orientation: "vertical"
-    size_hint_x: None
-    width: dp(120)
-    padding: dp(10)
+<WeatherRoot>:
+    orientation: 'vertical'
     spacing: dp(8)
-    canvas.before:
-        Color:
-            rgba: card_color
-        RoundedRectangle:
-            pos: self.pos
-            size: self.size
-            radius: [dp(12),]
+    padding: dp(8), dp(8)
 
-    Label:
-        text: root.hour
-        color: 1, 1, 1, 1
-        font_size: '20sp'
-        bold: True
-        size_hint_y: None
-        height: dp(25)
+    MDTopAppBar:
+        title: "Prognoza 7 dni"
+        elevation: 6
+        right_action_items: [["refresh", lambda x: app.reload()]]
+        md_bg_color: 0.15, 0.2, 0.25, 1
 
-    BoxLayout:
-        size_hint_y: None
-        height: dp(25)
-        
-        Label:
-            text: '\uf0eb'
-            color: 1, 0.8, 0.1, 1
-            size_hint_x: 0.3
-        
-        Label:
-            text: root.temp + "°C"
-            color: 1, 0.8, 0.1, 1
-            font_size: '16sp'
-            size_hint_x: 0.7
+    ScrollView:
+        do_scroll_x: False
+        MDBoxLayout:
+            orientation: "vertical"
+            size_hint_y: None
+            height: self.minimum_height
+            spacing: dp(12)
+            padding: dp(6)
 
-    BoxLayout:
-        size_hint_y: None
-        height: dp(25)
-        
-        Label:
-            text: '\uf050'
-            color: 0.4, 0.8, 1, 1
-            size_hint_x: 0.3
-        
-        Label:
-            text: root.wind + " m/s"
-            color: 0.4, 0.8, 1, 1
-            font_size: '16sp'
-            size_hint_x: 0.7
+            # === KARTA POWITALNA ===
+            MDCard:
+                size_hint_y: None
+                height: dp(150)
+                radius: [20]
+                padding: dp(16)
+                elevation: 6
+                md_bg_color: 0.18, 0.25, 0.35, 1
 
-    BoxLayout:
-        size_hint_y: None
-        height: dp(25)
-        
-        Label:
-            text: '\uf043'
-            color: 0.6, 0.7, 1, 1
-            size_hint_x: 0.3
-        
-        Label:
-            text: root.shower + " mm"
-            color: 0.6, 0.7, 1, 1
-            font_size: '16sp'
-            size_hint_x: 0.7
+                MDBoxLayout:
+                    orientation: "vertical"
+                    spacing: dp(8)
+                    MDLabel:
+                        text: "🌤️ Witaj w aplikacji pogodowej! Serdecznie zachecamy do uzywania."
+                        halign: "center"
+                        font_size: "20sp"
+                        text_color: 1, 1, 1, 1
+                    MDLabel:
+                        text: "Sprawdz prognoze na najbliższe 7 dni ponizej."
+                        halign: "center"
+                        font_size: "14sp"
+                        text_color: 0.9, 0.9, 0.9, 1
+
+            # === FUNKCJA DLA KART DNIA ===
+            # (powtarzamy 7 razy, bo KivyMD nie wspiera pętli w KV)
+
+            # === Dzień 1 ===
+            MDCard:
+                size_hint_y: None
+                height: dp(230)
+                radius: [20]
+                padding: dp(12)
+                elevation: 4
+                md_bg_color: 0.2, 0.3, 0.4, 1
+
+                MDBoxLayout:
+                    orientation: "vertical"
+                    spacing: dp(6)
+
+                    MDLabel:
+                        text: "Dzień 1"
+                        halign: "center"
+                        font_size: "18sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: status_label_day1
+                        text: "Status: Ładowanie..."
+                        halign: "center"
+                        font_size: "14sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: hour_value_day1
+                        text: "Godzina: --"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: temperature_value_day1
+                        text: "Temperatura: -- °C"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: rain_value_day1
+                        text: "Opady: -- mm"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: wind_value_day1
+                        text: "Wiatr: -- km/h"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+
+            # === Dzień 2 ===
+            MDCard:
+                size_hint_y: None
+                height: dp(230)
+                radius: [20]
+                padding: dp(12)
+                elevation: 4
+                md_bg_color: 0.2, 0.3, 0.4, 1
+
+                MDBoxLayout:
+                    orientation: "vertical"
+                    spacing: dp(6)
+
+                    MDLabel:
+                        text: "Dzień 2"
+                        halign: "center"
+                        font_size: "18sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: status_label_day2
+                        text: "Status: Ładowanie..."
+                        halign: "center"
+                        font_size: "14sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: hour_value_day2
+                        text: "Godzina: --"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: temperature_value_day2
+                        text: "Temperatura: -- °C"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: rain_value_day2
+                        text: "Opady: -- mm"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: wind_value_day2
+                        text: "Wiatr: -- km/h"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+
+            # === Dzień 3 ===
+            MDCard:
+                size_hint_y: None
+                height: dp(230)
+                radius: [20]
+                padding: dp(12)
+                elevation: 4
+                md_bg_color: 0.2, 0.3, 0.4, 1
+
+                MDBoxLayout:
+                    orientation: "vertical"
+                    spacing: dp(6)
+
+                    MDLabel:
+                        text: "Dzień 3"
+                        halign: "center"
+                        font_size: "18sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: status_label_day3
+                        text: "Status: Ładowanie..."
+                        halign: "center"
+                        font_size: "14sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: hour_value_day3
+                        text: "Godzina: --"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: temperature_value_day3
+                        text: "Temperatura: -- °C"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: rain_value_day3
+                        text: "Opady: -- mm"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: wind_value_day3
+                        text: "Wiatr: -- km/h"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+
+            # === Dzień 4 ===
+            MDCard:
+                size_hint_y: None
+                height: dp(230)
+                radius: [20]
+                padding: dp(12)
+                elevation: 4
+                md_bg_color: 0.2, 0.3, 0.4, 1
+
+                MDBoxLayout:
+                    orientation: "vertical"
+                    spacing: dp(6)
+
+                    MDLabel:
+                        text: "Dzień 4"
+                        halign: "center"
+                        font_size: "18sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: status_label_day4
+                        text: "Status: Ładowanie..."
+                        halign: "center"
+                        font_size: "14sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: hour_value_day4
+                        text: "Godzina: --"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: temperature_value_day4
+                        text: "Temperatura: -- °C"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: rain_value_day4
+                        text: "Opady: -- mm"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: wind_value_day4
+                        text: "Wiatr: -- km/h"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+
+            # === Dzień 5 ===
+            MDCard:
+                size_hint_y: None
+                height: dp(230)
+                radius: [20]
+                padding: dp(12)
+                elevation: 4
+                md_bg_color: 0.2, 0.3, 0.4, 1
+
+                MDBoxLayout:
+                    orientation: "vertical"
+                    spacing: dp(6)
+
+                    MDLabel:
+                        text: "Dzień 5"
+                        halign: "center"
+                        font_size: "18sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: status_label_day5
+                        text: "Status: Ładowanie..."
+                        halign: "center"
+                        font_size: "14sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: hour_value_day5
+                        text: "Godzina: --"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: temperature_value_day5
+                        text: "Temperatura: -- °C"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: rain_value_day5
+                        text: "Opady: -- mm"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: wind_value_day5
+                        text: "Wiatr: -- km/h"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+
+            # === Dzień 6 ===
+            MDCard:
+                size_hint_y: None
+                height: dp(230)
+                radius: [20]
+                padding: dp(12)
+                elevation: 4
+                md_bg_color: 0.2, 0.3, 0.4, 1
+
+                MDBoxLayout:
+                    orientation: "vertical"
+                    spacing: dp(6)
+
+                    MDLabel:
+                        text: "Dzień 6"
+                        halign: "center"
+                        font_size: "18sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: status_label_day6
+                        text: "Status: Ładowanie..."
+                        halign: "center"
+                        font_size: "14sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: hour_value_day6
+                        text: "Godzina: --"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: temperature_value_day6
+                        text: "Temperatura: -- °C"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: rain_value_day6
+                        text: "Opady: -- mm"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: wind_value_day6
+                        text: "Wiatr: -- km/h"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+
+            # === Dzień 7 ===
+            MDCard:
+                size_hint_y: None
+                height: dp(230)
+                radius: [20]
+                padding: dp(12)
+                elevation: 4
+                md_bg_color: 0.2, 0.3, 0.4, 1
+
+                MDBoxLayout:
+                    orientation: "vertical"
+                    spacing: dp(6)
+
+                    MDLabel:
+                        text: "Dzień 7"
+                        halign: "center"
+                        font_size: "18sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: status_label_day7
+                        text: "Status: Ładowanie..."
+                        halign: "center"
+                        font_size: "14sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: hour_value_day7
+                        text: "Godzina: --"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: temperature_value_day7
+                        text: "Temperatura: -- °C"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: rain_value_day7
+                        text: "Opady: -- mm"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
+                    MDLabel:
+                        id: wind_value_day7
+                        text: "Wiatr: -- km/h"
+                        halign: "center"
+                        font_size: "16sp"
+                        text_color: 1, 1, 1, 1
+
