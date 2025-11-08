@@ -4,10 +4,8 @@ from kivy.network.urlrequest import UrlRequest
 from kivy.clock import Clock
 from datetime import datetime, timedelta
 
-
 class WeatherRoot(BoxLayout):
     pass
-
 
 class WeatherApp(MDApp):
     BASE_URL = "https://adrian-gathering-twenty-donald.trycloudflare.com/weather"
@@ -71,7 +69,6 @@ class WeatherApp(MDApp):
         for i in range(7):
             self.root.ids[f"status_label_day{i+1}"].text = "..."
         self.load_all_days()
-
 
 if __name__ == '__main__':
     WeatherApp().run()
